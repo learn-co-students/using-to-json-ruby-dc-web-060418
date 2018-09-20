@@ -1,3 +1,4 @@
+require 'pry'
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update]
 
@@ -6,6 +7,11 @@ class PostsController < ApplicationController
   end
 
   def show
+    respond_to do |format|
+      format.html { render :show }
+      format.json { render json: @post.to_json(only: [:title, :description, :id],
+                                               include: [author: { only: [:name]}]) }
+    end
   end
 
   def new
@@ -28,7 +34,8 @@ class PostsController < ApplicationController
 
   def post_data
     post = Post.find(params[:id])
-    render json: PostSerializer.serialize(post)
+    render json: post.to_json(only: [:title, :description, :id],
+                              include: [ author: { only: [:name] }])
   end
 
 private
